@@ -12,6 +12,17 @@ import (
 )
 
 var replacer *strings.Replacer
+var tf_file_ext = ".tf"
+var var_prefix = "var."
+var varTemplate = template.Must(template.New("var_file").Parse(`{{ range . }} variable "{{ . }}" {
+	description  = ""
+ }
+ {{end}}
+ `))
+
+type TerraformVars struct {
+	Variables []string
+}
 
 func init() {
 	replacer = strings.NewReplacer(":", ".",
@@ -28,14 +39,6 @@ func init() {
 	)
 }
 
-var tf_file_ext = ".tf"
-var var_prefix = "var."
-var varTemplate = template.Must(template.New("var_file").Parse(`{{ range . }} variable "{{ . }}" {
-	description  = ""
- }
- {{end}}
- `))
-
 func containsElement(slice []string, value string) bool {
 	if len(slice) == 0 {
 		return false
@@ -47,6 +50,7 @@ func containsElement(slice []string, value string) bool {
 	}
 	return false
 }
+
 func getAllFiles(ext string) []string {
 	dir, err := os.Getwd()
 	if err != nil {
@@ -70,12 +74,25 @@ func getAllFiles(ext string) []string {
 	return files
 }
 
+func (t *TerraformVars) matchVarPref(row, var_prefix string) {
+	if strings.Contains(row, var_prefix) {
+		pattern := regexp.MustCompile(`var.([a-z?_]+)`)
+		match := pattern.FindAllStringSubmatch(row, 1)
+		if len(match) != 0 {
+			res := replacer.Replace(match[0][0])
+			if !containsElement(t.Variables, res) {
+				t.Variables = append(t.Variables, res)
+			}
+		}
+	}
+}
+
 func main() {
-	var parsed_vars []string
 	tf_files := getAllFiles(tf_file_ext)
 	var wg sync.WaitGroup
 	messages := make(chan string)
 	wg.Add(len(tf_files))
+	t := &TerraformVars{}
 
 	for _, file := range tf_files {
 		go func(file string) {
@@ -90,20 +107,11 @@ func main() {
 	}
 	go func() {
 		for text := range messages {
-			if strings.Contains(text, var_prefix) {
-				pattern := regexp.MustCompile(`var.([a-z?_]+)`)
-				match := pattern.FindAllStringSubmatch(text, 1)
-				if len(match) != 0 {
-					res := replacer.Replace(match[0][0])
-					if !containsElement(parsed_vars, res) {
-						parsed_vars = append(parsed_vars, res)
-					}
-				}
-			}
+			t.matchVarPref(text, var_prefix)
 		}
 	}()
 	wg.Wait()
-	err := varTemplate.Execute(os.Stdout, parsed_vars)
+	err := varTemplate.Execute(os.Stdout, t.Variables)
 	if err != nil {
 		panic(err)
 	}
