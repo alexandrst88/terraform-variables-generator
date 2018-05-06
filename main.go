@@ -13,7 +13,7 @@ import (
 )
 
 var replacer *strings.Replacer
-var tf_file_ext = ".tf"
+var tf_file_ext = "*.tf"
 var var_prefix = "var."
 var varTemplate = template.Must(template.New("var_file").Parse(`{{ range . }} variable "{{ . }}" {
 	description  = ""
@@ -55,23 +55,14 @@ func containsElement(slice []string, value string) bool {
 func getAllFiles(ext string) ([]string, error) {
 	dir, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	var files []string
-	err = filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
-		if err != nil {
-			log.Warn("prevent panic by handling failure accessing a path %q: %v\n", dir, err)
-			return err
-		}
-		if !f.IsDir() {
-			r, err := regexp.MatchString(ext, f.Name())
-			if err == nil && r {
-				files = append(files, f.Name())
-				log.Infof("Found file: %q", f.Name())
-			}
-		}
-		return nil
-	})
+	log.Infof("Finding files in %q directory", dir)
+	files, err = filepath.Glob(tf_file_ext)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return files, nil
 }
 
