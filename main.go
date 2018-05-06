@@ -15,6 +15,7 @@ import (
 var replacer *strings.Replacer
 var tf_file_ext = "*.tf"
 var var_prefix = "var."
+var dst_file = "./variables.tf"
 var varTemplate = template.Must(template.New("var_file").Parse(`{{range .}}
 variable "{{ . }}" {
 	description  = ""
@@ -41,6 +42,12 @@ func init() {
 	)
 }
 
+func checkError(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}
+
 func containsElement(slice []string, value string) bool {
 	if len(slice) == 0 {
 		return false
@@ -55,14 +62,15 @@ func containsElement(slice []string, value string) bool {
 
 func getAllFiles(ext string) ([]string, error) {
 	dir, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
+	checkError(err)
 	var files []string
 	log.Infof("Finding files in %q directory", dir)
 	files, err = filepath.Glob(tf_file_ext)
-	if err != nil {
-		log.Fatal(err)
+	checkError(err)
+
+	if len(files) == 0 {
+		log.Infof("No files with .tf extensions found in %q", dir)
+		os.Exit(0)
 	}
 	return files, nil
 }
@@ -80,11 +88,20 @@ func (t *TerraformVars) matchVarPref(row, var_prefix string) {
 	}
 }
 
-func main() {
-	tf_files, err := getAllFiles(tf_file_ext)
-	if err != nil {
-		log.Fatal(err)
+func fileExists(name string) bool {
+	if _, err := os.Stat(name); err == nil {
+		return true
 	}
+	return false
+}
+
+func main() {
+	if fileExists(dst_file) {
+		log.Warnf("File %q already exists, please remove it or it will be overridden", dst_file)
+	}
+
+	tf_files, err := getAllFiles(tf_file_ext)
+	checkError(err)
 	var wg sync.WaitGroup
 	messages := make(chan string)
 	wg.Add(len(tf_files))
@@ -107,8 +124,10 @@ func main() {
 		}
 	}()
 	wg.Wait()
-	err = varTemplate.Execute(os.Stdout, t.Variables)
-	if err != nil {
-		log.Fatal(err)
-	}
+	f, err := os.Create(dst_file)
+	checkError(err)
+
+	err = varTemplate.Execute(f, t.Variables)
+	checkError(err)
+
 }
