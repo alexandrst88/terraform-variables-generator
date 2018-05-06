@@ -15,11 +15,12 @@ import (
 var replacer *strings.Replacer
 var tf_file_ext = "*.tf"
 var var_prefix = "var."
-var varTemplate = template.Must(template.New("var_file").Parse(`{{ range . }} variable "{{ . }}" {
+var varTemplate = template.Must(template.New("var_file").Parse(`{{range .}}
+variable "{{ . }}" {
 	description  = ""
- }
+}
  {{end}}
- `))
+`))
 
 type TerraformVars struct {
 	Variables []string
