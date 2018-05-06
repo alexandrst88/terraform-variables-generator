@@ -2,13 +2,14 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"html/template"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var replacer *strings.Replacer
@@ -51,7 +52,7 @@ func containsElement(slice []string, value string) bool {
 	return false
 }
 
-func getAllFiles(ext string) []string {
+func getAllFiles(ext string) ([]string, error) {
 	dir, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -59,19 +60,19 @@ func getAllFiles(ext string) []string {
 	var files []string
 	err = filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
-			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", dir, err)
+			log.Warn("prevent panic by handling failure accessing a path %q: %v\n", dir, err)
 			return err
 		}
 		if !f.IsDir() {
 			r, err := regexp.MatchString(ext, f.Name())
 			if err == nil && r {
 				files = append(files, f.Name())
-				fmt.Printf("Found file: %q\n", f.Name())
+				log.Infof("Found file: %q", f.Name())
 			}
 		}
 		return nil
 	})
-	return files
+	return files, nil
 }
 
 func (t *TerraformVars) matchVarPref(row, var_prefix string) {
@@ -88,7 +89,10 @@ func (t *TerraformVars) matchVarPref(row, var_prefix string) {
 }
 
 func main() {
-	tf_files := getAllFiles(tf_file_ext)
+	tf_files, err := getAllFiles(tf_file_ext)
+	if err != nil {
+		log.Fatal(err)
+	}
 	var wg sync.WaitGroup
 	messages := make(chan string)
 	wg.Add(len(tf_files))
@@ -111,8 +115,8 @@ func main() {
 		}
 	}()
 	wg.Wait()
-	err := varTemplate.Execute(os.Stdout, t.Variables)
+	err = varTemplate.Execute(os.Stdout, t.Variables)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
