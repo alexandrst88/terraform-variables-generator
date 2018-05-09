@@ -42,6 +42,10 @@ func main() {
 	}
 
 	tfFiles, err := getAllFiles(tfFileExt)
+	if len(tfFiles) == 0 {
+		log.Warn("No terraform files to proceed, exiting")
+		os.Exit(0)
+	}
 	checkError(err)
 	var wg sync.WaitGroup
 	messages := make(chan string)

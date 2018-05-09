@@ -1,0 +1,11 @@
+//Mock Terraform Configuration File
+resource "aws_eip" "nat" {
+  vpc   = true
+  count = "${length(var.public_subnets)}"
+}
+
+resource "aws_nat_gateway" "nat" {
+  allocation_id = "${element(aws_eip.nat.*.id, count.index)}"
+  subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
+  count         = "${length(var.public_subnets)}"
+}

@@ -12,12 +12,11 @@ func getAllFiles(ext string) ([]string, error) {
 	checkError(err)
 	var files []string
 	log.Infof("Finding files in %q directory", dir)
-	files, err = filepath.Glob(tfFileExt)
+	files, err = filepath.Glob(ext)
 	checkError(err)
 
 	if len(files) == 0 {
-		log.Infof("No files with .tf extensions found in %q", dir)
-		os.Exit(0)
+		log.Infof("No files with %q extensions found in %q", ext, dir)
 	}
 	return files, nil
 }
