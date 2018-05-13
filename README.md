@@ -1,6 +1,6 @@
 # terraform-variables-generator
 
-Simple Tool for Generate Variables file from Terraform Configuration. It will find all *.tf files in current directory, and generate varibales.tf file, if you already have this file, it will ask to override it.
+Simple Tool for Generate Variables file from Terraform Configuration. It will find all *.tf files in current directory, and generate variables.tf file. If you already have this file, it will ask to override it.
 
 ## Build
 
@@ -14,7 +14,7 @@ go build .
 ./terraform-variables-generator
 ```
 
-It will find all *.tf files in current directory, and generate varibales.tf file, if you already have this file, it will ask to override it.
+It will find all *.tf files in current directory, and generate variables.tf file. If you already have this file, it will ask to override it.
 
 ### Example
 
