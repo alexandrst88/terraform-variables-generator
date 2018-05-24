@@ -17,10 +17,9 @@ var tfFileExt = "*.tf"
 var dstFile = "./variables.tf"
 var varTemplate = template.Must(template.New("var_file").Parse(`{{range .}}
 variable "{{ . }}" {
-   description  = ""
+	description  = ""
 }
- {{end}}
-`))
+{{end}}`))
 
 func init() {
 	replacer = strings.NewReplacer(":", ".",
