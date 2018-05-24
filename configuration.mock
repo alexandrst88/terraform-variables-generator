@@ -15,6 +15,6 @@ data "template_file" "template1" {
   vars {
     t1_var1 = "${var.t1_var1}"
     t1-var2 = "${var.t1-var2}"
-    t1-var3 = "${var.t1-Var3}"
+    t1-var3 = "${var.t1-Var3}-${var.t1-inline}"
   }
 }
