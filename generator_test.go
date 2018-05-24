@@ -41,8 +41,9 @@ func TestMatchVariable(t *testing.T) {
 	for _, text := range messages {
 		ter.matchVarPref(text, varPrefix)
 	}
-	if len(ter.Variables) != 1 {
-		t.Errorf("Should return one variable. but returned %d", len(ter.Variables))
+	if len(ter.Variables) != 5 {
+		t.Errorf("Should return five variable. but returned %d", len(ter.Variables))
+		t.Errorf("Variables found: %s", ter.Variables)
 	}
 
 }

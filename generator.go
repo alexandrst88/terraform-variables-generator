@@ -17,10 +17,9 @@ var tfFileExt = "*.tf"
 var dstFile = "./variables.tf"
 var varTemplate = template.Must(template.New("var_file").Parse(`{{range .}}
 variable "{{ . }}" {
-   description  = ""
+	description  = ""
 }
- {{end}}
-`))
+{{end}}`))
 
 func init() {
 	replacer = strings.NewReplacer(":", ".",
@@ -72,6 +71,7 @@ func main() {
 	f, err := os.Create(dstFile)
 	checkError(err)
 
+	t.sortVars()
 	err = varTemplate.Execute(f, t.Variables)
 	checkError(err)
 	log.Infof("Variables are generated to %q file", dstFile)
