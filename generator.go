@@ -72,6 +72,7 @@ func main() {
 	f, err := os.Create(dstFile)
 	checkError(err)
 
+	t.sortVars()
 	err = varTemplate.Execute(f, t.Variables)
 	checkError(err)
 	log.Infof("Variables are generated to %q file", dstFile)

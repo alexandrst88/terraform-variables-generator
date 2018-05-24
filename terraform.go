@@ -2,6 +2,7 @@ package main
 
 import (
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -20,4 +21,8 @@ func (t *terraformVars) matchVarPref(row, varPrefix string) {
 			}
 		}
 	}
+}
+
+func (t *terraformVars) sortVars() {
+	sort.Sort(sort.StringSlice(t.Variables))
 }
