@@ -1,24 +1,25 @@
-package main
+package generator
 
 import (
 	"bufio"
 	"os"
 	"testing"
+
+	"github.com/alexandrst88/terraform-variables-generator/pkg/utils"
 )
 
-var mockFile = "tf_configuration.mock"
 var testExtFile = "*.mock"
 
 func TestContainsElement(t *testing.T) {
 	testSlice := []string{"Terraform", "Puppet", "Ansible"}
-	if containsElement(testSlice, "Chef") {
+	if utils.ContainsElement(testSlice, "Chef") {
 		t.Error("Should return false, but return true")
 	}
 }
 
 func TestGetAllFiles(t *testing.T) {
-	files, err := getAllFiles(testExtFile)
-	checkError(err)
+	files, err := utils.GetAllFiles(testExtFile)
+	utils.CheckError(err)
 	if len(files) == 0 {
 		t.Error("Should found at least one file")
 	}
@@ -28,8 +29,8 @@ func TestMatchVariable(t *testing.T) {
 	ter := &terraformVars{}
 	var messages []string
 
-	file, err := getAllFiles(testExtFile)
-	checkError(err)
+	file, err := utils.GetAllFiles(testExtFile)
+	utils.CheckError(err)
 
 	fileHandle, _ := os.Open(file[0])
 	defer fileHandle.Close()

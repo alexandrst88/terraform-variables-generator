@@ -1,9 +1,11 @@
-package main
+package generator
 
 import (
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/alexandrst88/terraform-variables-generator/pkg/utils"
 )
 
 type terraformVars struct {
@@ -16,7 +18,7 @@ func (t *terraformVars) matchVarPref(row, varPrefix string) {
 		match := pattern.FindAllStringSubmatch(row, -1)
 		for _, m := range match {
 			res := replacer.Replace(m[0])
-			if !containsElement(t.Variables, res) {
+			if !utils.ContainsElement(t.Variables, res) {
 				t.Variables = append(t.Variables, res)
 			}
 		}
@@ -24,5 +26,5 @@ func (t *terraformVars) matchVarPref(row, varPrefix string) {
 }
 
 func (t *terraformVars) sortVars() {
-	sort.Sort(sort.StringSlice(t.Variables))
+	sort.Strings(t.Variables)
 }
