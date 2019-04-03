@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"os"
@@ -7,13 +7,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func getAllFiles(ext string) ([]string, error) {
+// GetAllFiles will get all files in current directory
+func GetAllFiles(ext string) ([]string, error) {
 	dir, err := os.Getwd()
-	checkError(err)
+	CheckError(err)
+
 	var files []string
 	log.Infof("Finding files in %q directory", dir)
 	files, err = filepath.Glob(ext)
-	checkError(err)
+	CheckError(err)
 
 	if len(files) == 0 {
 		log.Infof("No files with %q extensions found in %q", ext, dir)
@@ -21,7 +23,8 @@ func getAllFiles(ext string) ([]string, error) {
 	return files, nil
 }
 
-func fileExists(name string) bool {
+// FileExists checks if file exists
+func FileExists(name string) bool {
 	if _, err := os.Stat(name); err == nil {
 		return true
 	}

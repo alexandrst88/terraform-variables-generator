@@ -1,13 +1,17 @@
 language: go
 go:
-  - 1.9
+  - 1.12
+env:
+  - GO111MODULE=on
 # Don't email me the results of the test runs.
 notifications:
   email: false
 before_script:
-  - go get github.com/golang/lint/golint                        # Linter
+  - go get -u golang.org/x/lint/golint                        # Linter
+  - go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 
 script:
   - go test -v -race ./...                   # Run all the tests with the race detector enabled
   - go vet ./...                             # go vet is the official Go static analyzer
   - golint -set_exit_status $(go list ./...) # one last linter
+  - golangci-lint run                        # some more linters

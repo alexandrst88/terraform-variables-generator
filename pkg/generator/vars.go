@@ -1,4 +1,4 @@
-package main
+package generator
 
 import (
 	"bufio"
@@ -8,13 +8,13 @@ import (
 	"sync"
 
 	log "github.com/sirupsen/logrus"
+
+	"github.com/alexandrst88/terraform-variables-generator/pkg/utils"
 )
 
 var replacer *strings.Replacer
 var varPrefix = "var."
-var tfFileExt = "*.tf"
 
-var dstFile = "./variables.tf"
 var varTemplate = template.Must(template.New("var_file").Parse(`{{range .}}
 variable "{{ . }}" {
   description = ""
@@ -35,17 +35,9 @@ func init() {
 		" ", "",
 	)
 }
-func main() {
-	if fileExists(dstFile) {
-		userPromt()
-	}
 
-	tfFiles, err := getAllFiles(tfFileExt)
-	if len(tfFiles) == 0 {
-		log.Warn("No terraform files to proceed, exiting")
-		os.Exit(0)
-	}
-	checkError(err)
+// GenerateVars will write generated vars to file
+func GenerateVars(tfFiles []string, dstFile string) {
 	var wg sync.WaitGroup
 	messages := make(chan string)
 	wg.Add(len(tfFiles))
@@ -69,11 +61,10 @@ func main() {
 	}()
 	wg.Wait()
 	f, err := os.Create(dstFile)
-	checkError(err)
+	utils.CheckError(err)
 
 	t.sortVars()
 	err = varTemplate.Execute(f, t.Variables)
-	checkError(err)
+	utils.CheckError(err)
 	log.Infof("Variables are generated to %q file", dstFile)
-
 }
