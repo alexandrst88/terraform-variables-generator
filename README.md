@@ -1,6 +1,7 @@
 # terraform-variables-generator
 
-Terraform versions support ![version](https://img.shields.io/badge/version-0.11.*-blue) ![version](https://img.shields.io/badge/version-0.12.*-blue) ![version](https://img.shields.io/badge/version-0.13.*-blue)
+Terraform versions support ![version](https://img.shields.io/badge/version-0.11.*-blue) ![version](https://img.shields.io/badge/version-0.12.*-blue) ![version](https://img.shields.io/badge/version-0.13.*-blue) ![Build Status](https://github.com/alexandrst88/terraform-variables-generator/workflows/release/badge.svg) [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/AlexandrSt88.svg?style=social&label=Follow%20%40AlexandrSt88)](https://twitter.com/AlexandrSt88)
+
 
 Simple Tool to Generate Variables file from Terraform Configuration. It will find all *.tf files in current directory, and generate variables.tf file. If you already have this file, it will ask to override it.
 
