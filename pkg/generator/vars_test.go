@@ -46,5 +46,27 @@ func TestMatchVariable(t *testing.T) {
 		t.Errorf("Should return five variable. but returned %d", len(ter.Variables))
 		t.Errorf("Variables found: %s", ter.Variables)
 	}
+}
 
+func TestMatchLocal(t *testing.T) {
+	ter := &terraformVars{}
+	var messages []string
+
+	file, err := utils.GetAllFiles(testExtFile)
+	utils.CheckError(err)
+
+	fileHandle, _ := os.Open(file[0])
+	defer fileHandle.Close()
+
+	fileScanner := bufio.NewScanner(fileHandle)
+	for fileScanner.Scan() {
+		messages = append(messages, fileScanner.Text())
+	}
+	for _, text := range messages {
+		ter.matchLocalPref(text, localPrefix)
+	}
+	if len(ter.Locals) != 2 {
+		t.Errorf("Should return two variable. but returned %d", len(ter.Locals))
+		t.Errorf("Variables found: %s", ter.Locals)
+	}
 }

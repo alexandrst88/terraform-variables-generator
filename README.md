@@ -1,6 +1,15 @@
 # terraform-variables-generator
 
+Terraform versions support ![version](https://img.shields.io/badge/version-0.11.*-blue) ![version](https://img.shields.io/badge/version-0.12.*-blue) ![version](https://img.shields.io/badge/version-0.13.*-blue)
+
 Simple Tool to Generate Variables file from Terraform Configuration. It will find all *.tf files in current directory, and generate variables.tf file. If you already have this file, it will ask to override it.
+
+| Version | Supports |
+|---------|----------|
+| 0.11.*  |    yes   |
+| 0.12.*  |    yes   |
+| 0.13.*  |    yes   |
+
 
 ## Build
 
@@ -20,17 +29,17 @@ It will find all *.tf files in current directory, and generate variables.tf file
 
 ```text
 resource "aws_vpc" "vpc" {
-  cidr_block           = "${var.cidr}"
-  enable_dns_hostnames = "${var.enable_dns_hostnames}"
-  enable_dns_support   = "${var.enable_dns_support}"
+  cidr_block           = var.cidr
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support   = var.enable_dns_support
 
   tags {
-    Name = "${var.name}"
+    Name = var.name
   }
 }
 
 resource "aws_internet_gateway" "vpc" {
-  vpc_id = "${aws_vpc.vpc.id}"
+  vpc_id = aws_vpc.vpc.id
 
   tags {
     Name = "${var.name}-igw"
@@ -74,3 +83,7 @@ Run tests and linter
 go test -v -race ./...
 golint -set_exit_status $(go list ./...)
 ```
+
+## TO DO
+
+Move Locals and Variables to Single Interface

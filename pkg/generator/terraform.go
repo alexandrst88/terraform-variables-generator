@@ -10,6 +10,7 @@ import (
 
 type terraformVars struct {
 	Variables []string
+	Locals    []string
 }
 
 func (t *terraformVars) matchVarPref(row, varPrefix string) {
@@ -25,6 +26,19 @@ func (t *terraformVars) matchVarPref(row, varPrefix string) {
 	}
 }
 
-func (t *terraformVars) sortVars() {
-	sort.Strings(t.Variables)
+func (t *terraformVars) matchLocalPref(row, localPrefix string) {
+	if strings.Contains(row, localPrefix) {
+		pattern := regexp.MustCompile(`local.([a-z?A-Z?0-9?_][a-z?A-Z?0-9?_?-]*)`)
+		match := pattern.FindAllStringSubmatch(row, -1)
+		for _, m := range match {
+			res := replacer.Replace(m[0])
+			if !utils.ContainsElement(t.Locals, res) {
+				t.Locals = append(t.Locals, res)
+			}
+		}
+	}
+}
+
+func (t *terraformVars) sort(vars []string) {
+	sort.Strings(vars)
 }
