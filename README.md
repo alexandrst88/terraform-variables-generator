@@ -24,11 +24,11 @@ go build .
 ./terraform-variables-generator
 ```
 
-It will find all *.tf files in current directory, and generate variables.tf file. If you already have this file, it will ask to override it.
+It will find all `*.tf` files in current directory, and generate variables.tf file. If you already have this file, it will ask to override it.
 
 ### Example
 
-```text
+```hcl
 resource "aws_vpc" "vpc" {
   cidr_block           = var.cidr
   enable_dns_hostnames = var.enable_dns_hostnames
@@ -48,33 +48,33 @@ resource "aws_internet_gateway" "vpc" {
 }
 ```
 
- Will generate
+Will generate
 
- ```text
- variable "ami" {
-   description  = ""
+```hcl
+variable "ami" {
+  description = ""
 }
 
 variable "instance_type" {
-   description  = ""
+  description = ""
 }
 
 variable "cidr" {
-   description  = ""
+  description = ""
 }
 
 variable "enable_dns_hostnames" {
-   description  = ""
+  description = ""
 }
 
 variable "enable_dns_support" {
-   description  = ""
+  description = ""
 }
 
 variable "name" {
-   description  = ""
+  description = ""
 }
- ```
+```
 
 ## Tests
 

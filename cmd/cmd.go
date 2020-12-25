@@ -19,9 +19,10 @@ const (
 var (
 	generatorVersion string
 
-	vars       bool
-	varsFile   string
-	localsFile string
+	vars            bool
+	varsDescription bool
+	varsFile        string
+	localsFile      string
 )
 
 // Execute will run main logic
@@ -37,6 +38,7 @@ func Execute(version string) {
 	}
 
 	cmd.PersistentFlags().BoolVar(&vars, "vars", true, "generate variables")
+	cmd.PersistentFlags().BoolVar(&varsDescription, "vars-description", true, "include description on variables")
 	cmd.PersistentFlags().StringVar(&varsFile, "vars-file", "./variables.tf", "path to generated variables file")
 	cmd.PersistentFlags().StringVar(&localsFile, "locals-file", "./locals.tf", "path to generated locals file")
 
@@ -64,6 +66,6 @@ func runGenerator(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		generator.Generate(tfFiles, varsFile, localsFile)
+		generator.Generate(tfFiles, varsFile, localsFile, varsDescription)
 	}
 }

@@ -16,11 +16,15 @@ var replacer *strings.Replacer
 var varPrefix = "var."
 var localPrefix = "local."
 
-var varTemplate = template.Must(template.New("var_file").Parse(`{{range .}}
-variable "{{ . }}" {
+var varTemplate = template.Must(template.New("var_file").Funcs(template.FuncMap{"sub": sub}).Parse(`{{- $length := len .Variables -}}
+{{- range $i, $v := .Variables -}}
+{{ if $.VariablesDescription }}variable "{{ $v }}" {
   description = ""
-}
-{{end}}`))
+}{{ else }}variable "{{ $v }}" {}{{ end }}
+{{- if lt $i (sub $length 1) }}{{ "\n\n" }}{{ end -}}
+{{ end -}}{{printf "\n"}}`))
+
+func sub(a, b int) int { return a - b }
 
 var localsTemplate = template.Must(template.New("locals_file").Parse(`locals { {{ range . }}
   {{ . }} ={{ end }}
@@ -44,11 +48,12 @@ func init() {
 }
 
 // Generate will write inputs to file
-func Generate(tfFiles []string, varsDstFile string, localsDstFile string) {
+func Generate(tfFiles []string, varsDstFile string, localsDstFile string, varsDescription bool) {
 	var wg sync.WaitGroup
 	messages := make(chan string)
 	wg.Add(len(tfFiles))
 	t := &terraformVars{}
+	t.VariablesDescription = varsDescription
 
 	for _, file := range tfFiles {
 		go func(file string) {
@@ -75,7 +80,7 @@ func Generate(tfFiles []string, varsDstFile string, localsDstFile string) {
 		log.Infof("Variables are generated to %q file", varsDstFile)
 
 		t.sort(t.Variables)
-		err = varTemplate.Execute(f, t.Variables)
+		err = varTemplate.Execute(f, t)
 		utils.CheckError(err)
 	}
 

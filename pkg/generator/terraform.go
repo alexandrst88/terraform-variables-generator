@@ -9,8 +9,9 @@ import (
 )
 
 type terraformVars struct {
-	Variables []string
-	Locals    []string
+	Locals               []string
+	Variables            []string
+	VariablesDescription bool
 }
 
 func (t *terraformVars) matchVarPref(row, varPrefix string) {
